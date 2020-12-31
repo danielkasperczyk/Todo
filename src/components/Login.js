@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import image from '../icons/addNote.svg';
 import { useState } from 'react';
-
+import { auth, generateUserDocument } from '../units/firebase';
 import LoginForm from './LoginForm';
 
 const Container = styled.div`
@@ -46,17 +46,68 @@ const BigButton = styled.button`
     
 `
 const Login = props => {
-    const [login, changeLogin] = useState(true);
+    const [signup, changeLogin] = useState(true);
+    const [displayName, setDisplayName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState(null);
+    const [data, setData] = useState([])
+
+      const onChangeHandler = (event) => {
+          const {name, value} = event.currentTarget;
+
+          if(name === 'email') {
+              setEmail(value);
+          }
+          else if(name === 'password'){
+            setPassword(value);
+          }
+          else if(name === 'username'){
+              setDisplayName(value);
+          }
+      };
+
+      const onSubmitHandler = async e => {
+          e.preventDefault();
+          if(signup){
+            try{
+                const {user} = await auth.createUserWithEmailAndPassword(email, password);
+                console.log(user, displayName)
+                user.updateProfile({
+                    displayName: displayName
+                })
+              }
+              catch(error){
+                setError('Error Signing up with email and password');
+              }
+          
+              setEmail("");
+              setPassword("");
+              setDisplayName("");
+        }
+        else {
+            console.log(email, password)
+            auth.signInWithEmailAndPassword(email, password).catch(error => {
+                setError("Error signing in with password and email!");
+                console.error("Error signing in with password and email", error);
+              });
+        }
+      }
+
     return(
         <Container>
             <ContainerIcon>
                 <img src={image} />
             </ContainerIcon>
             <ContainerLogin>
-                <LoginForm change={login}/>
+                <LoginForm 
+                change={signup}
+                handler={onChangeHandler}
+                getData={onSubmitHandler}
+                />
                 <BigButton
-                    onClick={() => changeLogin(!login)}>
-                    {login ? 'Don’t have account? Sign up' : 'Do you have account? Sign In'}
+                    onClick={() => changeLogin(!signup)}>
+                    {signup ? 'Do you have account? Sign In' : 'Don’t have account? Sign up'}
                 </BigButton>
             </ContainerLogin>
         </Container>

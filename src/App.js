@@ -1,19 +1,20 @@
 import React from 'react'
-import { Router } from 'react-router-dom';
-import Login from './components/Login'
-import { GlobalStyle, theme } from './units/styles';
 import { ThemeProvider } from 'styled-components';
+import { GlobalStyle, theme } from './units/styles';
+
+import UserProvider from './providers/UserProvider';
+import Main from './components/Main';
 
 const App = () => {
   return(
-    <>
+    <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <ThemeProvider theme={theme}>
-        <Login />
-      </ThemeProvider>
-    </>
+      <UserProvider>
+        <Main />
+      </UserProvider>
+    </ThemeProvider>
+
   ) 
 }
-
 
 export default App;

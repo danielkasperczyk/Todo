@@ -31,20 +31,19 @@ const FormName = styled.div`
 `
 
 
-const LoginForm = ({change}) => {
-    
+const LoginForm = ({change, handler, getData}) => {
 
     return(
         <div>
             {change ? <h1>Sign Up</h1> : <h1>Sign In</h1>}
-            <Form>
+            <Form onSubmit={getData}>
             {change && <FormName>    
-                <input placeholder="Name"></input>
-                <input placeholder="Last name"></input>
+                <input placeholder="Name" name="name"></input>
+                <input placeholder="Last name" name="lastName"></input>
             </FormName>}
-                <input placeholder="User name"></input>
-                <input placeholder="Email"></input>
-                <input placeholder="Password"></input>
+                {change && <input onChange={e => handler(e)} placeholder="User name" name="username"></input>}
+                <input onChange={e => handler(e)} placeholder="Email" name="email"></input>
+                <input onChange={e => handler(e)} placeholder="Password" name="password"></input>
                 <button type="submit">{change ? 'Create Account' : 'Sign In'}</button>
             </Form>
         </div>
