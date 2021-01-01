@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router} from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route} from 'react-router-dom'
 import styled from 'styled-components';
+import Nav from './Nav';
+import Todo from './Todo';
+import Notes from './Notes';
 
 const Wraper = styled.div`
     width: 100vw;
@@ -14,7 +17,15 @@ class MainApp extends Component {
         return(
             <Router>
                 <Wraper>
-                    <h1> work</h1>
+                    <Nav />
+                    <Switch>
+                        <Route exact path="/">
+                            <Todo />
+                        </Route>
+                        <Route path="/notes">
+                            <Notes />
+                        </Route>
+                    </Switch>
                 </Wraper>
             </Router>
         )
