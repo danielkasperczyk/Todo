@@ -1,5 +1,8 @@
+import { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
+
+import { UserContext } from "../providers/UserProvider";
 import { auth } from '../units/firebase';
 import NavList from './NavList';
 
@@ -11,7 +14,7 @@ const Container = styled.div`
     align-items: center;
     justify-content: space-between;
     background-color: ${({theme}) => theme.todo};
-    width: 125px;
+    width: 150px;
 `
 const User = styled.div`
     border-radius: 50%;
@@ -39,14 +42,15 @@ const Button = styled.button`
 `
 
 const Nav = (props) => {
+    const user = useContext(UserContext);
+    const displayName = user.displayName
     const userSignout = () => {
         auth.signOut();
     }
-    
     return (
         <Container>
             <User>
-                <h2>C</h2>  
+                <h2>{displayName.slice(0,1).toUpperCase()}</h2>  
             </User>  
             <NavList />
             <div>

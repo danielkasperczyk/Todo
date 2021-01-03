@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 
 const List = styled.ul`
     display: flex;
@@ -8,15 +8,18 @@ const List = styled.ul`
     list-style: none;
     width: 100%;
     li{
-        text-align: center;
         width: 100%;
-        padding: 0.5rem ;
         margin: 0.5rem 0;
+        &:nth-child(2){
+            margin-bottom: 2rem;
+        }
     }
     a{
+        display: inline-block;
         font-size: 1rem;
         padding: 0.75rem;
         text-decoration: none;
+        width: 100%;
     }
 `
 const ListP = styled.div`
@@ -29,38 +32,39 @@ const ListP = styled.div`
         font-weight: 400;
     }
 `
+const StyledLink = styled(NavLink)`
+    background-color: ${({active}) => active && "#1D95C3"};
+    color: ${({active}) => active && "#ffffff"};
+`
 
-const NavList = props => {
-
+const NavList = () => {
+    let { pathname } = useLocation();
     return(
         <>
             <List>
             <li>
-                <NavLink 
-                    to="/">
+                <StyledLink 
+                    to="/"
+                    active={pathname === "/" ? true : false}>
                         Today
-                </NavLink>
+                </StyledLink>
             </li>
             <li>
-                <NavLink 
-                    to="/days">
-                        Next 7 days
-                </NavLink>
-            </li>
-            <li>
-                <NavLink 
-                    to="/calendar">
+                <StyledLink 
+                    to="/calendar"
+                    active={pathname === "/calendar" ? true : false}>
                         Calendar
-                </NavLink>
+                </StyledLink>
             </li>
             <ListP>
                 <h3>Lists</h3>
             </ListP>
             <li>
-                <NavLink 
-                    to="/list">
+                <StyledLink 
+                    to="/list"
+                    active={pathname === "/list" ? true : false}>
                         List 1
-                </NavLink>
+                </StyledLink>
             </li>.
         </List>
     </>
