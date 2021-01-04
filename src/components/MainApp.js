@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route} from 'react-router-dom'
+import { database } from '../units/firebase';
+import  uniqid from 'uniqid';
+
 import styled from 'styled-components';
 import Nav from './Nav';
 import Today from './Today';
@@ -22,30 +25,44 @@ const Container = styled.div`
 `
 
 class MainApp extends Component {
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this.state = {
+            user: props.user,
             modal: false,
+            modalType: true // IF TRUE, WITH MODAL USER CAN ADD NOTES, ELSE ADD NEW LIST IN NAV
         }
         this.showModal = this.showModal.bind(this);
+        this.getTodo = this.getTodo.bind(this);
     }
-
-    showModal(){
+    
+    getTodo(obj) {
+        // DO SOMETHING
+        if(this.state.modalType === false) {
+            database.ref(`users/${this.state.user.uid}/list`).set({
+                listId: uniqid(),
+                listName : obj.text
+            })
+        }
+    }
+    showModal(bool){
         let currentModal = this.state.modal
-        console.log(currentModal);
-        this.setState({modal: !currentModal})
+        this.setState({modal: !currentModal, modalType: bool})
     }
     render(){
         return(
             <Router>
                 <Wraper>
-                    <Modal 
+                    <Modal
+                        type={this.state.modalType}
                         modal={this.state.modal}
                         show={this.showModal}
+                        getTodo={this.getTodo}
                         />
-                    <Nav />
+                    <Nav show={this.showModal}/>
                     <Container>
-                    <MakeTodo show={this.showModal}/>
+                    <MakeTodo 
+                        show={this.showModal}/>
                     <Container secondary>
                         <Switch>
                             <Route exact path="/">

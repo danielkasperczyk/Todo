@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import image from '../icons/addNote.svg';
 import { useState } from 'react';
-import { auth, generateUserDocument } from '../units/firebase';
+import { auth, database } from '../units/firebase';
 import LoginForm from './LoginForm';
 
 const Container = styled.div`
@@ -72,9 +72,12 @@ const Login = props => {
           if(signup){
             try{
                 const {user} = await auth.createUserWithEmailAndPassword(email, password);
-                console.log(user, displayName)
                 user.updateProfile({
                     displayName: displayName
+                })
+                database.ref('users/' + user.uid).set({
+                    username: user.displayName,
+                    email: user.email
                 })
               }
               catch(error){

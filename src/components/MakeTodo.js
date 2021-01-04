@@ -24,7 +24,7 @@ const Button = styled.button`
 const MakeTodo = ({show}) => {
     return(
         <Wrapper>
-            <Button onClick={show}>+</Button>
+            <Button onClick={() => show(true)}>+</Button>
         </Wrapper>
     )
 }

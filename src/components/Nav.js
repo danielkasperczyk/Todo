@@ -1,5 +1,4 @@
 import { useContext } from 'react';
-import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { UserContext } from "../providers/UserProvider";
@@ -43,19 +42,22 @@ const Button = styled.button`
 
 const Nav = (props) => {
     const user = useContext(UserContext);
-    const displayName = user.displayName
+    let displayName = user.displayName
     const userSignout = () => {
         auth.signOut();
     }
+
+
     return (
         <Container>
             <User>
-                <h2>{displayName.slice(0,1).toUpperCase()}</h2>  
+                <h2>{displayName !== null &&displayName.slice(0,1).toUpperCase()}</h2>  
             </User>  
             <NavList />
             <div>
                 <Button
-                    type="button">+ New List</Button>
+                    type="button"
+                    onClick={() => props.show(false)}>+ New List</Button>
                 <Button 
                     signout="true"
                     type="button" 

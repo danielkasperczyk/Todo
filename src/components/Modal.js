@@ -35,7 +35,7 @@ const ModalInner = styled.div`
         margin: 0.5rem auto 0;
         width: 90%;
     }
-    textarea{
+    input{
         margin: 1rem 0;
         outline: 0;
         padding: 0.25rem;
@@ -66,7 +66,7 @@ const CalendarStyle = styled.div`
     right: 0;
 `
 
-const Modal = (props) => {
+const Modal = ({type, modal, show, getTodo}) => {
     const [text, setText] = useState('');
     const [day, setDay] = useState(new Date());
     const [showCalendar, setShow] = useState(false);
@@ -76,12 +76,19 @@ const Modal = (props) => {
 
     const handleSubmit = e =>{
         e.preventDefault();
-        console.log(day, text)
+        
+        let obj = type ? {
+            text,
+            day
+        } : { text }
+        
+        getTodo(obj);
+        setText('')
     }
+
     const pickDate = () => {
         const today = new Date().toLocaleDateString();
         const newDay = day.toLocaleDateString();
-        console.log(today, newDay)
         if(today === newDay){
             return 'Today';
         }
@@ -91,25 +98,31 @@ const Modal = (props) => {
     }
     const closeModal = e =>{
         if(e.target === e.currentTarget){
-            props.show()
+            show(type)
+            setShow(false)
         }
     }
     return(
-        <ModalOuter show={props.modal} onClick={closeModal}>
+        <ModalOuter show={modal} onClick={closeModal}>
             <ModalInner >
                 <form onSubmit={handleSubmit}>
                     <label>
-                        Adding Task
-                        <textarea
-                            placeholder="Go for a walk with my lovely dog :)"
+                        Adding {type ? 'Task' : 'List'}
+                        <input
+                            type="text"
+                            placeholder={type ? "Go for a walk with the dog" : "New project"}
                             value={text}
                             onChange={handleChange}
                             name="task"
-                            rows={5}/>
-                            <Button 
-                                onClick={e => setShow(!showCalendar)}>
-                                    {pickDate()}
-                            </Button>
+                            required/>
+                            {
+                                type && <Button 
+                                    type="button"
+                                    onClick={e => setShow(!showCalendar)}>
+                                        {pickDate()}
+                                </Button>
+                            }
+
                             {showCalendar && <CalendarStyle>
                                 <Calendar
                                     defaultValue={new Date()}
@@ -117,7 +130,7 @@ const Modal = (props) => {
                                     onChange={setDay}/>
                             </CalendarStyle>}
                     </label>
-                    <Button type="submit" formSubmit>Add Task</Button>
+                    <Button type="submit" formSubmit>Add {type ? "Task" : "List"}</Button>
                 </form>
             </ModalInner>                
         </ModalOuter>

@@ -7,7 +7,7 @@ function Main() {
   const user = useContext(UserContext);
   return (
         user ?
-        <MainApp />
+        <MainApp user={user} />
       :
         <Login />
 
