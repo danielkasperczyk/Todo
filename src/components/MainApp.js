@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route} from 'react-router-dom'
 import { database } from '../units/firebase';
+import { convertToArray } from '../units/helpers';
 import  uniqid from 'uniqid';
 
 import styled from 'styled-components';
@@ -30,24 +31,73 @@ class MainApp extends Component {
         this.state = {
             user: props.user,
             modal: false,
-            modalType: true // IF TRUE, WITH MODAL USER CAN ADD NOTES, ELSE ADD NEW LIST IN NAV
+            modalType: true, // IF TRUE, WITH MODAL USER CAN ADD NOTES, ELSE ADD NEW LIST IN NAV
+            todos: [],
+            lists: []
         }
         this.showModal = this.showModal.bind(this);
         this.getTodo = this.getTodo.bind(this);
+        this.fetchFromDatabase = this.fetchFromDatabase.bind(this);
+        this.deleteTodo = this.deleteTodo.bind(this);
+        this.setModalType = this.setModalType.bind(this);
     }
-    
+
+    componentDidMount(){
+        this.fetchFromDatabase();
+    }
+
+    fetchFromDatabase(){
+        database.ref(`/users/${this.state.user.uid}`).once('value')
+            .then(dataSnapshot => {
+                const {lists, todos} = dataSnapshot.val();    
+                console.log(todos)            
+                lists !== undefined ? this.setState({ lists }) : this.setState({ lists: []})
+                todos !== undefined ? this.setState({ todos }) : this.setState({ todos: []})
+            })
+    }
+    deleteTodo(todo){
+        const { todos } = this.state;
+        const todosStateCopy = Object.keys(todos).map((key) => [(key), todos[key]])   
+        const getTodo = todosStateCopy.filter(item => item[1].todoId === todo.todoId && item[0])[0].shift();
+        database.ref(`users/${this.state.user.uid}/todos/${getTodo}`).remove();
+        this.fetchFromDatabase();
+    }
     getTodo(obj) {
         // DO SOMETHING
         if(this.state.modalType === false) {
-            database.ref(`users/${this.state.user.uid}/list`).set({
-                listId: uniqid(),
-                listName : obj.text
-            })
+            const listsCopy = this.state.lists.length > 0 ? convertToArray(this.state.lists) : [];
+            let exist = listsCopy.length > 0 ? listsCopy.find(list => list.listName === obj.text) : false
+            if(!exist){
+                const listRef = database.ref(`users/${this.state.user.uid}/lists`);
+                const newListRef = listRef.push();
+                const list = {
+                    listId: uniqid(),
+                    listName: obj.text
+                }
+                
+                newListRef.set(list);
+                this.fetchFromDatabase();
+            }
+        }
+        else{        
+            const todosRef = database.ref(`users/${this.state.user.uid}/todos`);
+            const newTodoRef = todosRef.push();
+            const todo = {
+                todoId: uniqid(),
+                todo: obj.text,
+                todoData: obj.day
+            }
+            newTodoRef.set(todo);
+            this.fetchFromDatabase();
         }
     }
+
     showModal(bool){
         let currentModal = this.state.modal
         this.setState({modal: !currentModal, modalType: bool})
+    }
+    setModalType(bool){
+        this.setState({modalType: bool})
     }
     render(){
         return(
@@ -59,14 +109,20 @@ class MainApp extends Component {
                         show={this.showModal}
                         getTodo={this.getTodo}
                         />
-                    <Nav show={this.showModal}/>
+                    <Nav 
+                        show={this.showModal}
+                        lists={convertToArray(this.state.lists)}/>
                     <Container>
                     <MakeTodo 
                         show={this.showModal}/>
                     <Container secondary>
                         <Switch>
                             <Route exact path="/">
-                                <Today />
+                                <Today 
+                                    todos={convertToArray(this.state.todos)}
+                                    deleteTodo={this.deleteTodo}
+                                    getTodo={this.getTodo}
+                                    setModalType={this.setModalType}/>
                             </Route>
                             <Route path="/calendar">
                                 <Calendar />
