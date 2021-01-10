@@ -59,7 +59,7 @@ const Today = ({ todos, deleteTodo, getTodo, setModalType }) => {
                     </button>
                     <input 
                         type="text" 
-                        placeholder="Add fast note"
+                        placeholder="Add fast todo"
                         onChange={e =>setText(e.target.value)}
                         value={text}/>
                 </TodayForm>

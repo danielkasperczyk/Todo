@@ -1,12 +1,19 @@
 import styled from 'styled-components';
 import { NavLink, useLocation } from 'react-router-dom';
-
+import { convertToArray } from '../units/helpers';
 const List = styled.ul`
     display: flex;
     flex-direction: column;
     align-items: center;
     list-style: none;
     width: 100%;
+    height: auto;
+    overflow-y: scroll;
+    scrollbar-width: none; 
+     -ms-overflow-style: none; 
+    &::-webkit-scrollbar { 
+    display: none;
+  }  
     li{
         width: 100%;
         margin: 0.5rem 0;
@@ -37,7 +44,7 @@ const StyledLink = styled(NavLink)`
     color: ${({active}) => active && "#ffffff"};
 `
 
-const NavList = () => {
+const NavList = ({lists}) => {
     let { pathname } = useLocation();
     return(
         <>
@@ -59,13 +66,14 @@ const NavList = () => {
             <ListP>
                 <h3>Lists</h3>
             </ListP>
-            <li>
-                <StyledLink 
-                    to="/list"
-                    active={pathname === "/list" ? true : false}>
-                        List 1
+                {convertToArray(lists).map(list => <li>
+                    <StyledLink
+                        to={`/list/${list.listName.replace(/\s+/g, '-').toLowerCase()}`}
+                        active={pathname === `/list/${list.listName.replace(/\s+/g, '-').toLowerCase()}`  ? true : false}>
+                            {list.listName}
                 </StyledLink>
-            </li>.
+                    </li>
+                )}
         </List>
     </>
     )

@@ -40,7 +40,7 @@ const Button = styled.button`
     background-color: transparent;
 `
 
-const Nav = (props) => {
+const Nav = ({show, lists}) => {
     const user = useContext(UserContext);
     let displayName = user.displayName
     const userSignout = () => {
@@ -53,11 +53,11 @@ const Nav = (props) => {
             <User>
                 <h2>{displayName !== null &&displayName.slice(0,1).toUpperCase()}</h2>  
             </User>  
-            <NavList />
+            <NavList lists={lists}/>
             <div>
                 <Button
                     type="button"
-                    onClick={() => props.show(false)}>+ New List</Button>
+                    onClick={() => show(false)}>+ New List</Button>
                 <Button 
                     signout="true"
                     type="button" 

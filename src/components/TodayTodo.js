@@ -8,6 +8,7 @@ const TodoContainer = styled.div`
     align-items: center;
     font-size: 1.2rem;
     margin: 0.5rem 0;
+    width: 100%;
 `
 const TodoCircle = styled.button`
     width: 30px;

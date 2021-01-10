@@ -39,6 +39,7 @@ class MainApp extends Component {
         this.getTodo = this.getTodo.bind(this);
         this.fetchFromDatabase = this.fetchFromDatabase.bind(this);
         this.deleteTodo = this.deleteTodo.bind(this);
+        this.deleteList = this.deleteList.bind(this);
         this.setModalType = this.setModalType.bind(this);
     }
 
@@ -49,8 +50,7 @@ class MainApp extends Component {
     fetchFromDatabase(){
         database.ref(`/users/${this.state.user.uid}`).once('value')
             .then(dataSnapshot => {
-                const {lists, todos} = dataSnapshot.val();    
-                console.log(todos)            
+                const {lists, todos} = dataSnapshot.val();               
                 lists !== undefined ? this.setState({ lists }) : this.setState({ lists: []})
                 todos !== undefined ? this.setState({ todos }) : this.setState({ todos: []})
             })
@@ -62,17 +62,25 @@ class MainApp extends Component {
         database.ref(`users/${this.state.user.uid}/todos/${getTodo}`).remove();
         this.fetchFromDatabase();
     }
+    deleteList(id){
+        const {lists} = this.state;
+        const listStateCopy = Object.keys(lists).map((key) => [(key), lists[key]]);
+        const getList = listStateCopy.filter(item => item[1].listId === id && item[0])[0].shift();
+        database.ref(`users/${this.state.user.uid}/lists/${getList}`).remove();
+        this.fetchFromDatabase();
+    }
     getTodo(obj) {
         // DO SOMETHING
         if(this.state.modalType === false) {
-            const listsCopy = this.state.lists.length > 0 ? convertToArray(this.state.lists) : [];
+            const listsCopy = convertToArray(this.state.lists).length > 0 ? convertToArray(this.state.lists) : [];
             let exist = listsCopy.length > 0 ? listsCopy.find(list => list.listName === obj.text) : false
             if(!exist){
                 const listRef = database.ref(`users/${this.state.user.uid}/lists`);
                 const newListRef = listRef.push();
                 const list = {
                     listId: uniqid(),
-                    listName: obj.text
+                    listName: obj.text,
+                    listTodo: []
                 }
                 
                 newListRef.set(list);
@@ -111,7 +119,7 @@ class MainApp extends Component {
                         />
                     <Nav 
                         show={this.showModal}
-                        lists={convertToArray(this.state.lists)}/>
+                        lists={this.state.lists}/>
                     <Container>
                     <MakeTodo 
                         show={this.showModal}/>
@@ -128,7 +136,11 @@ class MainApp extends Component {
                                 <Calendar />
                             </Route>
                             <Route path="/list">
-                                <List />
+                                <List 
+                                    lists={this.state.lists}
+                                    deleteList={this.deleteList}
+                                    fetch={this.fetchFromDatabase}
+                                    deleteTodo={this.deleteTodo}/>
                             </Route>
                         </Switch>
                         </Container>
